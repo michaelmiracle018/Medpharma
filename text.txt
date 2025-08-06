@@ -1,0 +1,661 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+import {ActivityIndicator, TouchableOpacity, View} from 'react-native'
+import {useEffect, useMemo, useState} from 'react'
+import {Text} from '~/components/ui/text'
+import ScreenWrapperWithScrollView from '~/components/ScreenWrapperWithScrollView'
+import {Card} from '~/components/ui/card'
+import {ArrowLeft} from '~/lib/icons/ArrowLeft'
+import {Button, buttonTextVariants} from '~/components/ui/button'
+import {RefreshCw} from '~/lib/icons/RefreshCw'
+import {Input} from '~/components/ui/input'
+import {Controller, useForm} from 'react-hook-form'
+import {MakeOrderProps, MarketOrderInputPropss} from '~/types'
+import {Label} from '~/components/ui/label'
+import {cn} from '~/lib/utils'
+import {ArrowLeftRight} from '~/lib/icons/ArrowLeftRight'
+import {Separator} from '~/components/ui/separator'
+import InputErrorMessage from '~/components/inputErrorMessage/InputErrorMessage'
+import MarketOrderPaymentInfo from '~/components/market/MarketOrderPaymentInfo'
+import {useLingui} from '@lingui/react'
+import {t} from '@lingui/core/macro'
+import {Trans} from '@lingui/react/macro'
+import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query'
+import {FETCH_ALL_ORDERS, MARKETORDER} from '~/query-data/querykeys'
+import {getSingleMarketId} from '~/services/currencyPair.services'
+import {calculateOrderAmount, createOrder} from '~/services/order.services'
+import {useRefreshOnFocus} from '~/hooks/useRefreshOnFocus'
+import useDebounce from '~/hooks/useDebounce'
+import {roundToUp} from 'round-to'
+import Colors from '~/constants/Colors'
+import {Skeleton} from '~/components/ui/skeleton'
+import {addCommas} from '~/utils/addCommas'
+import useWait from '~/hooks/useWait'
+import {NativeStackScreenProps} from '@react-navigation/native-stack'
+import {
+  CommonNavigatorParams,
+  NavigationMainProp,
+} from '~/types/navigationTypes'
+import {useNavigation} from '@react-navigation/native'
+import {validateAndFixNumbers} from '~/utils/validateAndFixNumbers'
+import {checkIsNumber} from '~/utils/checkNumber'
+import useFetchUserFromStorage from '~/shared/fetchUserFromStorage'
+import {ACCOUNT_TYPE} from '~/api/common/secretKeys'
+import NotificationBanner from '~/components/NotificationBanner'
+import CountTimer from '~/components/Timer/CountTimer'
+import UserNote from '~/components/UserNote'
+import {CircleLoading} from '~/components/loader/CircleLoading'
+import {toast} from 'sonner-native'
+
+export default function MarketOrder({
+  route,
+}: NativeStackScreenProps<CommonNavigatorParams, 'MarketOrder'>) {
+  const {_id, tradeType, targetCurrency, tradingCurrency, currencyRateDisplay} =
+    route.params
+  const navigation = useNavigation<NavigationMainProp>()
+
+  const [calculatedAmountData, setCalculatedAmountInfo] = useState(null)
+  const queryClient = useQueryClient()
+  const {storedData} = useFetchUserFromStorage(ACCOUNT_TYPE)
+
+  const [limitError, setLimitError] = useState(false)
+  const {i18n} = useLingui()
+  const handleBackPress = () => {
+    navigation.goBack()
+  }
+  const waitValue = useWait(300)
+
+  // * REACT-HOOK FORM
+  const {
+    control,
+    handleSubmit,
+    watch,
+    setValue,
+    clearErrors,
+    setError,
+    formState: {errors},
+  } = useForm<MarketOrderInputPropss>({
+    defaultValues: {
+      amount: '',
+      firstCurrency: tradingCurrency,
+      secondCurrency: targetCurrency,
+      paymentMethod: '',
+    },
+  })
+  const firstCurrencyName = watch('firstCurrency')
+  const secondCurrencyName = watch('secondCurrency')
+  const amountFigure = watch('amount')
+  // * DEBOUNCE AMOUNT CURRENCY
+  const debouncedAmount = useDebounce(amountFigure, 300)
+
+  //   ? FETCH SINGLE MARKET AD
+  const {
+    isLoading: isFetchingOrder,
+    data: marketInfo,
+    refetch: refetchSingleMarket,
+  } = useQuery({
+    queryKey: [MARKETORDER, _id],
+    queryFn: () => getSingleMarketId(_id),
+    enabled: !!_id && !!waitValue,
+  })
+
+  // * MEMORIZED MARKET DATA
+  const marketData = useMemo(() => {
+    if (marketInfo) {
+      return marketInfo
+    }
+    return null
+  }, [marketInfo])
+
+  // ? FUNCTION FOR CALCULATION ORDER
+  const {mutate: calculateOrderValue, isPending: isCalculatingAmount} =
+    useMutation({
+      mutationFn: (value: any) => calculateOrderAmount(value),
+      onSuccess: response => {
+        toast.dismiss()
+        setCalculatedAmountInfo(response)
+      },
+      onError: error => {},
+    })
+
+  // ? FUNCTION TO MAKE ORDER
+  const {mutate: submitToMakeOrder, isPending: isMakingOrder} = useMutation({
+    mutationFn: (value: MakeOrderProps) => createOrder(value),
+    onSuccess: async (response: any) => {
+      const {result} = response.data
+      await queryClient.invalidateQueries({
+        queryKey: [FETCH_ALL_ORDERS],
+      })
+      navigation.push('SingleOrderHistory', {
+        loginUserID: storedData?.userID,
+        _id: result?._id,
+        routeFrom: 'MarketOrder',
+      })
+    },
+    onError: error => {},
+  })
+
+  const calculatedAmountInfo = useMemo(() => {
+    if (calculatedAmountData) {
+      return calculatedAmountData as any
+    }
+    return null
+  }, [calculatedAmountData])
+
+  // * CALL ENDPOINT TO FETCH CALCULATED INFORMATION
+  // * Convert to number
+  function convertToNumber(amount: string | number) {
+    return Number(amount)
+  }
+  // * Make Calculation here
+  function calculateAmount(
+    amount1: string | any,
+    amount2: string | any,
+    amount3: string | any,
+  ) {
+    const data = (amount1 / amount2) * amount3
+
+    return Number(roundToUp(data, 2))
+  }
+
+  // * CALCULATE AMOUNT TO DISPLAY LIMITS, MAKE CHECKS AND DISPLAY ERRORS
+  function calculateLimit() {
+    const msg = t(i18n)`limit is between`
+
+    const firstLimit = convertToNumber(
+      marketData?.tradingAmountRange?.min?.$numberDecimal,
+    )
+    const lastLimit = convertToNumber(
+      marketData?.tradingAmountRange?.max?.$numberDecimal,
+    )
+    const tradingCurrencyAmount = convertToNumber(
+      marketData?.rate?.tradingCurrencyRate?.$numberDecimal,
+    )
+    const targetCurrencyAmount = convertToNumber(
+      marketData?.rate?.targetCurrencyRate?.$numberDecimal,
+    )
+
+    let newFirstLimit, newLastLimit
+    if (marketData?.amountRangeCurrency === firstCurrencyName) {
+      if (
+        Number(debouncedAmount) >= firstLimit &&
+        Number(debouncedAmount) <= lastLimit
+      ) {
+        calculateOrderValue({
+          tradeInAmount: Number(debouncedAmount),
+          tradeInCurrency: firstCurrencyName,
+          currencyPair: _id,
+        })
+      } else {
+        setError('amount', {
+          type: 'manual',
+          message: `${msg} (${firstLimit} - ${lastLimit}) ${firstCurrencyName} `,
+        })
+        setCalculatedAmountInfo(null)
+      }
+    } else {
+      if (
+        marketData?.amountRangeCurrency ===
+        currencyRateDisplay.tradingRateCurrency
+      ) {
+        newFirstLimit = calculateAmount(
+          firstLimit,
+          tradingCurrencyAmount,
+          targetCurrencyAmount,
+        )
+        newLastLimit = calculateAmount(
+          lastLimit,
+          tradingCurrencyAmount,
+          targetCurrencyAmount,
+        )
+        if (
+          Number(debouncedAmount) >= newFirstLimit &&
+          Number(debouncedAmount) <= newLastLimit
+        ) {
+          calculateOrderValue({
+            tradeInAmount: Number(debouncedAmount),
+            tradeInCurrency: firstCurrencyName,
+            currencyPair: _id,
+          })
+        } else {
+          setError('amount', {
+            type: 'manual',
+            message: `${msg} (${newFirstLimit} - ${newLastLimit}) ${firstCurrencyName} `,
+          })
+          setCalculatedAmountInfo(null)
+        }
+      }
+      if (
+        marketData?.amountRangeCurrency ===
+        currencyRateDisplay.targetRateCurrency
+      ) {
+        newFirstLimit = calculateAmount(
+          firstLimit,
+          targetCurrencyAmount,
+          tradingCurrencyAmount,
+        )
+        newLastLimit = calculateAmount(
+          lastLimit,
+          targetCurrencyAmount,
+          tradingCurrencyAmount,
+        )
+        if (
+          Number(debouncedAmount) >= newFirstLimit &&
+          Number(debouncedAmount) <= newLastLimit
+        ) {
+          calculateOrderValue({
+            tradeInAmount: Number(debouncedAmount),
+            tradeInCurrency: firstCurrencyName,
+            currencyPair: _id,
+          })
+        } else {
+          setError('amount', {
+            type: 'manual',
+            message: `${msg} (${newFirstLimit} - ${newLastLimit}) ${firstCurrencyName} `,
+          })
+          setCalculatedAmountInfo(null)
+        }
+      }
+    }
+  }
+
+  function calculateLimitBeforeSubmission() {
+    const msg = t(i18n)`limit is between`
+
+    const firstLimit = convertToNumber(
+      marketData?.tradingAmountRange?.min?.$numberDecimal,
+    )
+    const lastLimit = convertToNumber(
+      marketData?.tradingAmountRange?.max?.$numberDecimal,
+    )
+    const tradingCurrencyAmount = convertToNumber(
+      marketData?.rate?.tradingCurrencyRate?.$numberDecimal,
+    )
+    const targetCurrencyAmount = convertToNumber(
+      marketData?.rate?.targetCurrencyRate?.$numberDecimal,
+    )
+    const targetCurrency = marketData?.currencyPair?.targetCurrency
+    const tradingCurrency = marketData?.currencyPair?.tradingCurrency
+    let newFirstLimit, newLastLimit
+    if (marketData?.amountRangeCurrency === firstCurrencyName) {
+      if (
+        Number(debouncedAmount) >= firstLimit &&
+        Number(debouncedAmount) <= lastLimit
+      ) {
+        setLimitError(false)
+      } else {
+        setError('amount', {
+          type: 'manual',
+          message: `${msg} (${firstLimit} - ${lastLimit}) ${firstCurrencyName} `,
+        })
+        setLimitError(true)
+      }
+    } else {
+      if (marketData?.amountRangeCurrency === tradingCurrency) {
+        newFirstLimit = calculateAmount(
+          firstLimit,
+          tradingCurrencyAmount,
+          targetCurrencyAmount,
+        )
+        newLastLimit = calculateAmount(
+          lastLimit,
+          tradingCurrencyAmount,
+          targetCurrencyAmount,
+        )
+        if (
+          Number(debouncedAmount) >= newFirstLimit &&
+          Number(debouncedAmount) <= newLastLimit
+        ) {
+          setLimitError(false)
+        } else {
+          setError('amount', {
+            type: 'manual',
+            message: `${msg} (${newFirstLimit} - ${newLastLimit}) ${firstCurrencyName} `,
+          })
+          setLimitError(true)
+        }
+      }
+      if (marketData?.amountRangeCurrency === targetCurrency) {
+        newFirstLimit = calculateAmount(
+          firstLimit,
+          targetCurrencyAmount,
+          tradingCurrencyAmount,
+        )
+        newLastLimit = calculateAmount(
+          lastLimit,
+          targetCurrencyAmount,
+          tradingCurrencyAmount,
+        )
+        if (
+          Number(debouncedAmount) >= newFirstLimit &&
+          Number(debouncedAmount) <= newLastLimit
+        ) {
+          setLimitError(false)
+        } else {
+          setError('amount', {
+            type: 'manual',
+            message: `${msg} (${newFirstLimit} - ${newLastLimit}) ${firstCurrencyName} `,
+          })
+          setLimitError(true)
+        }
+      }
+    }
+  }
+
+  // * FUNCTION TO CURRENCY EXCHANGE
+  function getCalculatedAmount() {
+    const checkNumber = checkIsNumber(debouncedAmount)
+
+    if (checkNumber) {
+      clearErrors('amount')
+      if (debouncedAmount && firstCurrencyName && secondCurrencyName) {
+        calculateLimit()
+      } else if (!debouncedAmount) {
+        setCalculatedAmountInfo(null)
+      }
+    } else {
+      setError('amount', {
+        type: 'manual',
+        message: t(i18n)`Invalid parameter`,
+      })
+      setCalculatedAmountInfo(null)
+    }
+  }
+
+  // * FUNCTION TO SWITCH CURRENCY
+  const handleSwitchCurrencies = () => {
+    setValue('firstCurrency', secondCurrencyName, {shouldValidate: true})
+    setValue('secondCurrency', firstCurrencyName, {shouldValidate: true})
+  }
+
+  useEffect(() => {
+    getCalculatedAmount()
+  }, [debouncedAmount, firstCurrencyName])
+
+  // * HANDLE SUBMIT ORDER
+  const onSubmit = async (value: any) => {
+    calculateLimitBeforeSubmission()
+
+    if (limitError) return
+    const validAmount = validateAndFixNumbers(value.amount)
+
+    submitToMakeOrder({
+      tradeInAmount: Number(validAmount),
+      tradeInCurrency: firstCurrencyName,
+      currencyPair: _id,
+    })
+  }
+
+  useRefreshOnFocus(refetchSingleMarket)
+
+  return (
+    <>
+      <ScreenWrapperWithScrollView>
+        {/* BACK CUTTON */}
+        <View className="spacing-1">
+          <View className="flex-row items-center gap-3">
+            <TouchableOpacity onPress={handleBackPress} activeOpacity={1}>
+              <Card className="w-11 h-10 rounded-md flex-center">
+                <ArrowLeft
+                  className={buttonTextVariants({
+                    variant: 'secondary',
+                    className: 'opacity-100',
+                  })}
+                />
+              </Card>
+            </TouchableOpacity>
+            <View className="flex-row items-center justify-center gap-2">
+              <Text className="font-semibold text-xl">{tradingCurrency}</Text>
+              <ArrowLeftRight
+                className="text-black text-center rotate-180"
+                size={20}
+              />
+              <Text className="font-semibold text-xl">{targetCurrency}</Text>
+            </View>
+          </View>
+          {/* BACK BUTTON */}
+
+          <Card className="mt-10">
+            {marketData?.scheduler?.setAutomatedTrade && (
+              <View className="flex-row justify-between items-center">
+                <View className="flex justify-between">
+                  <NotificationBanner text={t(i18n)`Automated Trade`} />
+                </View>
+                <View>
+                  <CountTimer
+                    timeStamp={marketData?.scheduler?.automatedUntil}
+                  />
+                </View>
+              </View>
+            )}
+            <View className="px-2 py-3">
+              {isFetchingOrder ? (
+                <Skeleton className="h-8 w-30" />
+              ) : (
+                <View className="flex-row gap-3 items-center">
+                  <Text className="native:text-lg text-black font-bold">
+                    <Trans>Rate:</Trans>
+                  </Text>
+                  <Text className="native:text-lg text-black font-normal">
+                    {marketData?.currencyRateDisplay?.tradingRateCurrency}{' '}
+                    {addCommas(
+                      marketData?.rate?.tradingCurrencyRate?.$numberDecimal,
+                    )}
+                  </Text>
+                  <Text className="native:text-lg text-black font-bold">=</Text>
+                  <Text className="native:text-lg text-black font-normal">
+                    {marketData?.currencyRateDisplay?.targetRateCurrency}{' '}
+                    {addCommas(
+                      marketData?.rate?.targetCurrencyRate?.$numberDecimal,
+                    )}
+                  </Text>
+                  <TouchableOpacity onPress={() => refetchSingleMarket()}>
+                    <RefreshCw className="text-black" size={16} />
+                  </TouchableOpacity>
+                </View>
+              )}
+              {isFetchingOrder ? (
+                <Skeleton className="h-8 w-30" />
+              ) : (
+                <View className="flex-row gap-2 items-center mt-3">
+                  <Text className="native:text-lg text-black font-bold">
+                    <Trans>Limit:</Trans>
+                  </Text>
+                  <Text className="native:text-lg text-black font-normal">
+                    {addCommas(
+                      marketData?.tradingAmountRange?.min?.$numberDecimal,
+                    )}
+                  </Text>
+                  <Text className="native:text-lg text-black font-bold">-</Text>
+                  <Text className="native:text-lg text-black font-normal">
+                    {addCommas(
+                      marketData?.tradingAmountRange?.max?.$numberDecimal,
+                    )}
+                  </Text>
+                  <Text className="native:text-lg text-black font-normal">
+                    {marketData?.amountRangeCurrency}
+                  </Text>
+                </View>
+              )}
+            </View>
+            {/* AMOUNT INPUT */}
+            {/* {!isFetchingOrder &&
+              <>
+                <View className='flex justify-end items-end mt-3 mb-1'>
+                  <Badge variant={"outline"} className='w-24 flex-row gap-2 justify-center items-center'>
+                    <View className={cn(marketData?.onlineStatus === "online" ? "bg-green-400 w-3 h-3 rounded-full" : marketData?.onlineStatus === "offline" ? "bg-green-400 w-3 h-3 rounded-full" : "hidden")} />
+                    <Text>{marketData?.onlineStatus}</Text>
+                  </Badge>
+                </View>
+              </>
+            } */}
+            <View className="px-2 pb-3">
+              <View>
+                <Label className="font-medium">
+                  <Trans>Enter Amount</Trans>
+                </Label>
+                <View
+                  className={cn(
+                    'bg-stone-200 py-[0.1rem] px-2 flex-row items-center rounded-md',
+                    errors.amount?.type === 'required' &&
+                      'border-[#ef4444] border',
+                  )}>
+                  <View>
+                    <Text className="font-bold text-xl">
+                      {firstCurrencyName}
+                    </Text>
+                  </View>
+                  <View className="flex-1">
+                    <Controller
+                      control={control}
+                      rules={{
+                        required: t(i18n)`This field is required.`,
+                      }}
+                      render={({field: {onChange, onBlur, value}}: any) => (
+                        <Input
+                          className="border-0 bg-stone-200 font-medium text-lg text-right"
+                          onBlur={onBlur}
+                          onChangeText={text => onChange(text.trim())}
+                          value={value}
+                          placeholder={t(i18n)`Enter amount`}
+                          keyboardType="numeric"
+                        />
+                      )}
+                      name="amount"
+                    />
+                  </View>
+                </View>
+                <View className={cn(errors.amount && 'mb-4')}>
+                  <InputErrorMessage errors={errors} name="amount" />
+                </View>
+              </View>
+
+              {/* AMOUNT INPUT */}
+              {/* SWAP CURRENCY */}
+              <View className="flex-center z-99">
+                <View className="bg-white h-16 w-16 rounded-full flex-center -mt-2.5">
+                  <TouchableOpacity
+                    onPress={handleSwitchCurrencies}
+                    disabled={isCalculatingAmount || isFetchingOrder}
+                    activeOpacity={1}
+                    className={cn(
+                      'rounded-full w-12 h-12 flex-center',
+                      tradeType === 'Buy' ? 'bg-primary_2' : 'bg-success',
+                    )}>
+                    {isCalculatingAmount || isFetchingOrder ? (
+                      <ActivityIndicator color={Colors.white} size={30} />
+                    ) : (
+                      <ArrowLeftRight
+                        className="text-white text-center rotate-90"
+                        size={24}
+                      />
+                    )}
+                  </TouchableOpacity>
+                </View>
+              </View>
+              {/* SWAP CURRENCY */}
+              {/*  */}
+
+              <View className="mt-[-0.7rem] z-[-1]">
+                <View className="bg-stone-200 h-[3.7rem] px-2 flex-row items-center rounded-md">
+                  <View className="flex-row gap-2 items-center">
+                    <Text className="font-bold text-xl">
+                      {secondCurrencyName}
+                    </Text>
+                    <View className="flex-1 ml-2">
+                      {!calculatedAmountInfo ? (
+                        <>
+                          {(isCalculatingAmount || !isCalculatingAmount) && (
+                            <Text className="font-bold text-xl py-3.5">
+                              0.00
+                            </Text>
+                          )}
+                        </>
+                      ) : (
+                        <>
+                          {isCalculatingAmount ? (
+                            <Text className="font-bold text-xl py-3.5">
+                              0.00
+                            </Text>
+                          ) : (
+                            <Text className="font-bold text-xl py-3.5">
+                              {addCommas(calculatedAmountInfo?.convertedAmount)}
+                            </Text>
+                          )}
+                        </>
+                      )}
+                    </View>
+                  </View>
+                </View>
+              </View>
+              {/*  */}
+              <Separator className="mt-3 h-2" />
+              <MarketOrderPaymentInfo
+                calculatedAmountInfo={calculatedAmountInfo}
+                isLoading={isCalculatingAmount}
+                title={t(i18n)`You'll Pay`}
+                amount={calculatedAmountInfo?.amountToBePaidByCustomer}
+                currency={calculatedAmountInfo?.customerCurrency}
+              />
+              <MarketOrderPaymentInfo
+                calculatedAmountInfo={calculatedAmountInfo}
+                isLoading={isCalculatingAmount}
+                title={t(i18n)`Amount We'll Send`}
+                amount={calculatedAmountInfo?.customerAmountToTransact}
+                currency={calculatedAmountInfo?.customerCurrency}
+              />
+              <MarketOrderPaymentInfo
+                calculatedAmountInfo={calculatedAmountInfo}
+                isLoading={isCalculatingAmount}
+                title={t(i18n)`Service Charge`}
+                amount={calculatedAmountInfo?.customerServiceCharge}
+                currency={calculatedAmountInfo?.customerCurrency}
+              />
+              <MarketOrderPaymentInfo
+                calculatedAmountInfo={calculatedAmountInfo}
+                isLoading={isCalculatingAmount}
+                title={t(i18n)`You'll Receive`}
+                amount={calculatedAmountInfo?.traderAmountToTransact}
+                currency={calculatedAmountInfo?.traderCurrency}
+              />
+            </View>
+          </Card>
+          {marketData?.scheduler?.setAutomatedTrade && (
+            <Card className="px-2 py-3 w-full mt-8">
+              <Text className="text-yellow-600 text-center w-20 rounded-md bg-yellow-200 mb-2 font-bold text-lg">
+                <Trans>Note</Trans>
+              </Text>
+              <UserNote>
+                <Text>
+                  <Trans>
+                    You must have enough funds in your app wallet to complete
+                    this order.
+                  </Trans>
+                </Text>
+              </UserNote>
+            </Card>
+          )}
+          <View className="my-10">
+            <Button
+              className="bg-info rounded-md mt-5"
+              onPress={handleSubmit(onSubmit)}
+              disabled={
+                isMakingOrder || isFetchingOrder || isCalculatingAmount
+              }>
+              {isMakingOrder || isFetchingOrder || isCalculatingAmount ? (
+                <CircleLoading color={Colors.textHighlightColor} size={25} />
+              ) : (
+                <Text className="font-bold">
+                  {marketData?.scheduler?.setAutomatedTrade ? (
+                    <Trans>Submit trade</Trans>
+                  ) : (
+                    <Trans>Make an order</Trans>
+                  )}
+                </Text>
+              )}
+            </Button>
+          </View>
+        </View>
+      </ScreenWrapperWithScrollView>
+    </>
+  )
+}
