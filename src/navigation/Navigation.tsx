@@ -4,7 +4,7 @@ import {useEffect} from 'react'
 import {useModalControls} from '~/context/BottomModal'
 
 const AuthorizedNavigation = () => {
-  const isUserAuthenticated = false
+  const isUserAuthenticated = true
   const {openModal} = useModalControls()
 
   if (isUserAuthenticated) {

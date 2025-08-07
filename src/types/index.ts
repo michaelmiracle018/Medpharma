@@ -1,3 +1,4 @@
+import {Entypo} from '@expo/vector-icons'
 import {ViewStyle} from 'react-native'
 import {ClassNameValue} from 'tailwind-merge'
 
@@ -12,4 +13,11 @@ export type SignUpFormProps = {
   country: null | any
   confirmPassword: string
   password: string
+}
+
+export type TabNavProps = {
+  id: string
+  tabName: string
+  icon: keyof typeof Entypo.glyphMap
+  component: React.ComponentType<any>
 }

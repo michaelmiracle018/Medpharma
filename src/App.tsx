@@ -16,6 +16,7 @@ import Toastify from './components/Toast/Toastify'
 import '../reanimatedConfig'
 import AllNavigation from './navigation/AllNavigation'
 import Navigation from './navigation/Navigation'
+import {Provider as DoctorCategoryProvider} from './context/doctorCategoryContext/index'
 
 function InnerApp() {
   enableFreeze(true)
@@ -47,7 +48,9 @@ function InnerApp() {
 export default function App() {
   return (
     <>
-      <InnerApp />
+      <DoctorCategoryProvider>
+        <InnerApp />
+      </DoctorCategoryProvider>
     </>
   )
 }

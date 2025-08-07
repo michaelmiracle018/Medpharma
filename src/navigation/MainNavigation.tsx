@@ -1,10 +1,7 @@
 import CreateNativeStackNavigator from './CreateNativeStackNavigator'
 import {createNavigatorFactory} from '@react-navigation/native'
 import TabsNavigator from './TabsNavigator'
-
-import {useEffect} from 'react'
-import {isAndroid} from '~/lib/platform/detection'
-import {BackHandler} from 'react-native'
+import {SpecificDoctor} from '~/screens/doctors/SpecificDoctor'
 
 const createMyNavigator = createNavigatorFactory(CreateNativeStackNavigator)
 
@@ -27,7 +24,25 @@ export default function MainNavigation() {
 
   return (
     <>
-      <Stack.Navigator initialRouteName="HomeScreen">jeekkk</Stack.Navigator>
+      <Stack.Navigator initialRouteName="HomeScreen">
+        <>
+          <Stack.Screen
+            name="HomeScreen"
+            getComponent={() => TabsNavigator}
+            options={{
+              headerShown: false,
+            }}
+          />
+
+          <Stack.Screen
+            name="SpecificDoctor"
+            getComponent={() => SpecificDoctor}
+            options={{
+              headerShown: false,
+            }}
+          />
+        </>
+      </Stack.Navigator>
     </>
   )
 }

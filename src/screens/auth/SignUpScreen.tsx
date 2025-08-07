@@ -173,7 +173,7 @@ export const SignUpScreen = () => {
                     Phone Number
                   </Label>
                   <View className="flex-row gap-2">
-                    <View className="flex-row native:h-14 web:w-full rounded-md border border-info bg-background">
+                    <View className="flex-row native:h-14 web:w-full rounded-md border border-primary bg-background">
                       <View className={cn('flex-center px-2')}>
                         <Text
                           className={cn(
