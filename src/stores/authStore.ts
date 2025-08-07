@@ -1,6 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import { create } from 'zustand'
-import { removeDataFromStorage, storeDataInStorage } from '~/utils/storageData'
+import {create} from 'zustand'
+import {removeDataFromStorage, storeDataInStorage} from '~/utils/storageData'
 
 const ACCESS_TOKEN = 'thisisjustarandomstring'
 
@@ -22,26 +22,25 @@ interface AuthState {
   }
 }
 
-export const useAuthStore = create<AuthState>((set) => {
+export const useAuthStore = create<AuthState>(set => {
   return {
     auth: {
       user: null,
       accessToken: '',
-      setUser: (user) =>
-        set((state) => ({ ...state, auth: { ...state.auth, user } })),
-      setAccessToken: async (accessToken) => {
+      setUser: user => set(state => ({...state, auth: {...state.auth, user}})),
+      setAccessToken: async accessToken => {
         await storeDataInStorage(ACCESS_TOKEN, accessToken)
-        set((state) => ({ ...state, auth: { ...state.auth, accessToken } }))
+        set(state => ({...state, auth: {...state.auth, accessToken}}))
       },
       resetAccessToken: async () => {
         await removeDataFromStorage(ACCESS_TOKEN)
-        set((state) => ({ ...state, auth: { ...state.auth, accessToken: '' } }))
+        set(state => ({...state, auth: {...state.auth, accessToken: ''}}))
       },
       reset: async () => {
         await removeDataFromStorage(ACCESS_TOKEN)
-        set((state) => ({
+        set(state => ({
           ...state,
-          auth: { ...state.auth, user: null, accessToken: '' },
+          auth: {...state.auth, user: null, accessToken: ''},
         }))
       },
     },

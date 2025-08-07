@@ -1,6 +1,5 @@
 import CryptoJS from 'react-native-crypto-js'
-import { ENCRYPTION_SECRET_KEY } from '~/api/common/secretKeys'
-
+import {ENCRYPTION_SECRET_KEY} from '~/api/common/secretKeys'
 
 // Encrypt function
 export const encryptData = (data: any) => {

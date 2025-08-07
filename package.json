@@ -1,5 +1,5 @@
 {
-    "name": "SendAfrika",
+    "name": "Medpharma",
     "version": "1.82.0",
     "private": true,
     "engines": {
@@ -8,7 +8,7 @@
     "packageManager": "yarn@1.22.19",
     "scripts": {
         "prepare": "is-ci || husky install",
-        "postinstall": "patch-package && yarn intl:compile",
+        "postinstall": "patch-package",
         "prebuild": "expo prebuild --clean",
         "android": "expo run:android",
         "ios": "expo run:ios",
@@ -126,7 +126,9 @@
         "sonner-native": "^0.21.0",
         "tailwind-merge": "^2.5.4",
         "tailwindcss": "^3.4.15",
-        "zustand": "^5.0.5"
+        "zustand": "^5.0.5",
+        "onesignal-expo-plugin": "^2.0.3",
+        "react-native-onesignal": "^5.2.6"
     },
     "devDependencies": {
         "@babel/core": "^7.26.0",

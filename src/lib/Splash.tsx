@@ -18,12 +18,12 @@ SplashScreen.preventAutoHideAsync()
 
 export default function Splash({children}: any) {
   const [fontsLoaded] = useFonts({
-    NotoSansBold: require('../../assets/font/NotoSans-Bold.ttf'),
-    NotoSansLight: require('../../assets/font/NotoSans-Light.ttf'),
-    NotoSansMedium: require('../../assets/font/NotoSans-Medium.ttf'),
-    NotoSansRegular: require('../../assets/font/NotoSans-Regular.ttf'),
-    NotoSansSemiBold: require('../../assets/font/NotoSans-SemiBold.ttf'),
-    NotoSansThin: require('../../assets/font/NotoSans-Thin.ttf'),
+    // NotoSansBold: require('../../assets/font/NotoSans-Bold.ttf'),
+    // NotoSansLight: require('../../assets/font/NotoSans-Light.ttf'),
+    // NotoSansMedium: require('../../assets/font/NotoSans-Medium.ttf'),
+    // NotoSansRegular: require('../../assets/font/NotoSans-Regular.ttf'),
+    // NotoSansSemiBold: require('../../assets/font/NotoSans-SemiBold.ttf'),
+    // NotoSansThin: require('../../assets/font/NotoSans-Thin.ttf'),
   })
 
   const isAnimationCompleteForQui = useSharedValue(false)
@@ -153,7 +153,7 @@ export default function Splash({children}: any) {
               flexDirection: 'row',
             }}>
             <Animated.Text
-              className="text-blue-600 font-bold"
+              className="font-bold"
               style={[
                 {
                   fontSize: 30,
@@ -162,7 +162,7 @@ export default function Splash({children}: any) {
                 },
                 animatedStyles,
               ]}>
-              Send
+              Med
             </Animated.Text>
             <Animated.Text
               className="text-blue-200 font-bold"
@@ -174,7 +174,7 @@ export default function Splash({children}: any) {
                 },
                 animatedStylesK,
               ]}>
-              Afrika
+              Pharma
             </Animated.Text>
           </Animated.View>
           <Animated.View

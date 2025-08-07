@@ -14,6 +14,8 @@ import {QueryProvider} from './query-data/react-query'
 // import {BottomSheetDetachModalsContainer} from './bottomSheetModals/DetachModal'
 import Toastify from './components/Toast/Toastify'
 import '../reanimatedConfig'
+import AllNavigation from './navigation/AllNavigation'
+import Navigation from './navigation/Navigation'
 
 function InnerApp() {
   enableFreeze(true)
@@ -23,14 +25,16 @@ function InnerApp() {
       <SafeAreaProvider
         initialMetrics={initialWindowMetrics}
         className="bg-white">
-        <StatusBar style="dark" backgroundColor="#fff" />
-
         <GestureHandlerRootView className="bg-white flex-1">
           <React.Fragment key={'kkk'}>
             <QueryProvider currentDid={'Jejjj'}>
               <Splash>
-                <PortalHost />
-                <Toastify />
+                <AllNavigation>
+                  <Navigation />
+
+                  <PortalHost />
+                  <Toastify />
+                </AllNavigation>
               </Splash>
             </QueryProvider>
           </React.Fragment>
