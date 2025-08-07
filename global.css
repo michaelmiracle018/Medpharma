@@ -93,7 +93,7 @@
     @apply bg-black rounded-[3px] px-1
   } */
   .text-timer {
-    @apply text-black text-center text-sm font-bold
+    @apply text-black text-center text-xl font-bold
   }
   /* .days-text {
     @apply text-black text-center text-sm

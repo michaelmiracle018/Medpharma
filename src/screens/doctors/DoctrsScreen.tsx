@@ -37,8 +37,9 @@ const DoctrsScreen = () => {
           estimatedItemSize={200}
           scrollEnabled
           contentInsetAdjustmentBehavior="always"
+          showsVerticalScrollIndicator={false}
           numColumns={numColumns}
-          contentContainerStyle={{paddingBottom: 300}}
+          contentContainerStyle={{paddingBottom: 500}}
           ItemSeparatorComponent={() => <View style={{height: cardSpacing}} />}
           //   columnWrapperStyle={{ justifyContent: 'space-between' }}
           onEndReached={() => {}}

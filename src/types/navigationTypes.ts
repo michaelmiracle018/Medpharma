@@ -8,7 +8,9 @@ export type CommonNavigatorParams = {}
 
 export type BottomTabNavigatorParams = CommonNavigatorParams & {}
 
-export type MainNavigatorParams = {}
+export type MainNavigatorParams = {
+  SpecificDoctor: undefined
+}
 
 type DeviceInfoProps = {
   deviceOS: string

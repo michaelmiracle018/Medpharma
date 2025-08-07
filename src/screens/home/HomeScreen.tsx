@@ -14,6 +14,8 @@ import {Card} from '~/components/ui/card'
 import {Separator} from '~/components/ui/separator'
 import {Calendar} from '~/lib/icons/Calendar'
 import {AlarmClock} from '~/lib/icons/AlarmClock'
+import {useNavigation} from '@react-navigation/native'
+import {MainNavigatorParams, NavigationMainProp} from '~/types/navigationTypes'
 
 const numColumns = 2 // Number of items per row
 const itemMargin = 15
@@ -21,6 +23,8 @@ const itemSize =
   (Dimensions.get('window').width - itemMargin * (numColumns + 1)) / numColumns
 
 const HomeScreen = () => {
+  const navigation = useNavigation<NavigationMainProp>()
+
   return (
     <ScreenWrapperWithScrollView>
       <View className="native:ios:mt-10">
@@ -134,6 +138,7 @@ const HomeScreen = () => {
                       per session
                     </Text>
                     <Button
+                      onPress={() => navigation.navigate('SpecificDoctor')}
                       variant={'primary'}
                       className="rounded-full h-8 w-full mt-2"
                       size={'sm'}>
