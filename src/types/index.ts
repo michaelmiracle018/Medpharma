@@ -21,3 +21,10 @@ export type TabNavProps = {
   icon: keyof typeof Entypo.glyphMap
   component: React.ComponentType<any>
 }
+
+export interface IBookAppointment {
+  email: string
+  firstName: string
+  lastName: string
+  slotId: string | undefined
+}

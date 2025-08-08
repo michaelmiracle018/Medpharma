@@ -1,7 +1,8 @@
 import CreateNativeStackNavigator from './CreateNativeStackNavigator'
 import {createNavigatorFactory} from '@react-navigation/native'
-import TabsNavigator from './TabsNavigator'
 import {SpecificDoctor} from '~/screens/doctors/SpecificDoctor'
+import {BookAppointment} from '~/screens/appointments/BookAppointment'
+import HomeScreen from '~/screens/home/HomeScreen'
 
 const createMyNavigator = createNavigatorFactory(CreateNativeStackNavigator)
 
@@ -28,7 +29,7 @@ export default function MainNavigation() {
         <>
           <Stack.Screen
             name="HomeScreen"
-            getComponent={() => TabsNavigator}
+            getComponent={() => HomeScreen}
             options={{
               headerShown: false,
             }}
@@ -37,6 +38,13 @@ export default function MainNavigation() {
           <Stack.Screen
             name="SpecificDoctor"
             getComponent={() => SpecificDoctor}
+            options={{
+              headerShown: false,
+            }}
+          />
+          <Stack.Screen
+            name="BookAppointment"
+            getComponent={() => BookAppointment as any}
             options={{
               headerShown: false,
             }}

@@ -30,6 +30,4 @@ export const BASE_URL =
     ? process.env.EXPO_PUBLIC_API_PROD_BASE_URL
     : process.env.EXPO_PUBLIC_APP_BASE_URL
 
-// console.log(BASE_URL, "k");
-
 export const REFRESH_TOKEN_URL = `${BASE_URL}/auth/refresh`

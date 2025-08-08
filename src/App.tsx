@@ -17,6 +17,10 @@ import '../reanimatedConfig'
 import AllNavigation from './navigation/AllNavigation'
 import Navigation from './navigation/Navigation'
 import {Provider as DoctorCategoryProvider} from './context/doctorCategoryContext/index'
+import {BottomSheetDetachModalsContainer} from './bottomSheetModals/DetachModal'
+import {Provider as DetachModalStateProvider} from './context/DetachModal'
+import {Provider as PortalProvider} from './bottomSheetModals/Portal'
+import {BottomSheetProvider} from './bottomSheetModals/BottomSheetPortal'
 
 function InnerApp() {
   enableFreeze(true)
@@ -32,6 +36,7 @@ function InnerApp() {
               <Splash>
                 <AllNavigation>
                   <Navigation />
+                  <BottomSheetDetachModalsContainer />
 
                   <PortalHost />
                   <Toastify />
@@ -49,7 +54,13 @@ export default function App() {
   return (
     <>
       <DoctorCategoryProvider>
-        <InnerApp />
+        <DetachModalStateProvider>
+          <PortalProvider>
+            <BottomSheetProvider>
+              <InnerApp />
+            </BottomSheetProvider>
+          </PortalProvider>
+        </DetachModalStateProvider>
       </DoctorCategoryProvider>
     </>
   )

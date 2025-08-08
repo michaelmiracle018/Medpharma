@@ -1175,6 +1175,11 @@
   dependencies:
     "@jridgewell/trace-mapping" "0.3.9"
 
+"@dgreasi/react-native-time-slot-picker@^0.2.0":
+  version "0.2.0"
+  resolved "https://registry.yarnpkg.com/@dgreasi/react-native-time-slot-picker/-/react-native-time-slot-picker-0.2.0.tgz#91dbe8b6d3b4e4a260f72c0b624c4a5c814908bc"
+  integrity sha512-lwukJdcSpxT7DVxqUFTNCF3L9/StVpUaeE8YbS/8c7pYk/PG1IfKVTo8MaRSSmP+KGZSHgwHBXQnD5qMuPZz0A==
+
 "@discoveryjs/json-ext@0.5.7", "@discoveryjs/json-ext@^0.5.0":
   version "0.5.7"
   resolved "https://registry.yarnpkg.com/@discoveryjs/json-ext/-/json-ext-0.5.7.tgz#1d572bfbbe14b7704e0ba0f39b74815b84870d70"

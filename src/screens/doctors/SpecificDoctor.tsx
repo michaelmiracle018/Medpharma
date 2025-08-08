@@ -13,9 +13,11 @@ import {Card} from '~/components/ui/card'
 import {Calendar} from '~/lib/icons/Calendar'
 import CountTimer from '~/components/Timer/CountTimer'
 import {Button} from '~/components/ui/button'
+import {useDetachModalControls, useDetachModals} from '~/context/DetachModal'
 
 export const SpecificDoctor = () => {
   const navigation = useNavigation<NavigationAuthProp>()
+  const {closeAllDetachModals, openDetachModal} = useDetachModalControls()
 
   return (
     <View className="flex-1 bg-white" style={{paddingTop: statusBarHeight}}>
@@ -35,6 +37,10 @@ export const SpecificDoctor = () => {
             <H2 className="text-xl font-bold text-black">Dr. Amelia Harper</H2>
             <Text className="text-base">Internal Medicine</Text>
             <Text className="text-base ">5 years experience</Text>
+          </View>
+          <View className="flex-center my-5">
+            <Text className="font-bold text-3xl text-primary">4</Text>
+            <Text className="text-gray-500 ">You are 3rd in the queue</Text>
           </View>
           <View>
             <View className="flex-row mt-5 items-center p-4 rounded-lg bg-green-50 border border-green-200">
@@ -77,10 +83,18 @@ export const SpecificDoctor = () => {
               </Card>
             </View>
 
-            <View className="mt-20">
+            <View className="mt-20 flex-row justify-between items-center gap-5">
+              <Button
+                onPress={() =>
+                  openDetachModal({name: 'cancel-appointment-modal'})
+                }
+                variant={'destructive'}
+                className="bg-destructive active:bg-destructive flex-1">
+                <Text className="text-white">Cancel</Text>
+              </Button>
               <Button
                 variant={'primary'}
-                className="bg-primary active:bg-primary">
+                className="bg-primary active:bg-primary flex-1">
                 <Text className="text-white">Join Call</Text>
               </Button>
             </View>

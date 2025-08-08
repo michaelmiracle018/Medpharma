@@ -4,12 +4,16 @@ import {QueryObserverResult, RefetchOptions} from '@tanstack/react-query'
 
 export type {NativeStackScreenProps} from '@react-navigation/native-stack'
 
-export type CommonNavigatorParams = {}
+export type CommonNavigatorParams = {
+  BookAppointment: {id: string}
+}
 
 export type BottomTabNavigatorParams = CommonNavigatorParams & {}
 
 export type MainNavigatorParams = {
   SpecificDoctor: undefined
+  Doctors: undefined
+  BookAppointment: {id: string}
 }
 
 type DeviceInfoProps = {
