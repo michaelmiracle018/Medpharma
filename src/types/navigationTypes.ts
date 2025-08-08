@@ -6,6 +6,7 @@ export type {NativeStackScreenProps} from '@react-navigation/native-stack'
 
 export type CommonNavigatorParams = {
   BookAppointment: {id: string}
+  AllAppointment: {id: string}
 }
 
 export type BottomTabNavigatorParams = CommonNavigatorParams & {}
@@ -14,6 +15,7 @@ export type MainNavigatorParams = {
   SpecificDoctor: undefined
   Doctors: undefined
   BookAppointment: {id: string}
+  AllAppointment: {id: string}
 }
 
 type DeviceInfoProps = {

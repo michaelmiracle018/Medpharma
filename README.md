@@ -7,7 +7,7 @@ This is a [Expo](https://docs.expo.dev/tutorial/create-your-first-app/) project 
 4. 🤸 [Quick Start](#quick-start)
 
 ## <a name="introduction">🤖 Introduction</a>
-This is a platform for seamless peer-to-peer Online/Fiat currency trading in African currencies at the best FX rate.
+This is a platform for booking appointment with doctor
 
 ## <a name="tech-stack">⚙️ Tech Stack</a>
 
@@ -22,7 +22,7 @@ This is a platform for seamless peer-to-peer Online/Fiat currency trading in Afr
 - React Native Reusables
 
 ## <a name="features">🔋 Features</a>
-👉 **Home Page**: page for all market.
+👉 **Home Page**: page for user.
 
 ## <a name="quick-start">🤸 Quick Start</a>
 
@@ -38,13 +38,19 @@ Make sure you have the following installed on your machine:
 
 **Cloning the Repository**
 ```bash
-git clone https://github.com/SENDAFRIKA1/sendAfrika_mobile
-cd sendAfrika_mobile
+git clone https://github.com/michaelmiracle018/Medpharma.git
+cd Medpharma-main
 ```
 
+**Install the Libraries**
+First, run yarn to install the library:
+
+```bash
+yarn 
+```
 
 **Running the Project**
-First, run the development server:
+Then, run the development server:
 
 ```bash
 yarn start

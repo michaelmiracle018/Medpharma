@@ -17,10 +17,10 @@ import {Header} from './components/Header'
 import {NavigationMainProp} from '~/types/navigationTypes'
 import {useNavigation} from '@react-navigation/native'
 import {useRefreshOnFocus} from '~/hooks/useRefreshOnFocus'
-
-const numColumns = 2
-const cardSpacing = 12
-const cardWidth = (Screen_width - (numColumns + 1) * cardSpacing) / numColumns
+import {Separator} from '~/components/ui/separator'
+import {Stethoscope} from '~/lib/icons/Stethoscope'
+import CustomTouchable from '~/components/CustomTouchable'
+import {id} from '@gorhom/bottom-sheet/src/utilities/id'
 
 const HomeScreen = () => {
   const navigation = useNavigation<NavigationMainProp>()
@@ -53,37 +53,64 @@ const HomeScreen = () => {
             scrollEnabled
             contentInsetAdjustmentBehavior="always"
             showsVerticalScrollIndicator={false}
-            numColumns={numColumns}
             contentContainerStyle={{paddingBottom: 300}}
             renderItem={({item}) => (
-              <View style={[styles.cardContainer, {width: cardWidth}]}>
-                <Card className="bg-white rounded-xl shadow p-2 items-center">
-                  <Image
-                    source={images.doctor_img}
-                    className="w-16 h-16 rounded-full mb-2"
-                  />
-                  <Text className="text-base font-semibold">{item?.name}</Text>
-                  <Text className="text-gray-500">{item?.role}</Text>
-                  <Text className="text-gray-500">
-                    <Text className="text-primary font-bold">GhS 50</Text> per
-                    session
-                  </Text>
-                  <Button
-                    onPress={() =>
-                      navigation.navigate('BookAppointment', {id: item?._id})
-                    }
-                    variant="primary"
-                    className="rounded-full h-8 w-full mt-2"
-                    size="sm">
-                    <Text className="text-white">Book</Text>
-                  </Button>
+              <View className="my-5">
+                <Card className="bg-white rounded-xl shadow p-2">
+                  <View className="flex-row items-center justify-between">
+                    <View className="flex-row items-center">
+                      <Image
+                        source={images.doctor_img}
+                        className="w-14 h-14 rounded-full mr-4"
+                      />
+                      <View>
+                        <Text className="text-base font-semibold">
+                          {item?.name}
+                        </Text>
+                        <Text className="text-gray-500">{item?.role}</Text>
+                        <Text className="text-gray-500">
+                          <Text className="text-primary font-bold">GhS 50</Text>{' '}
+                          per session
+                        </Text>
+                      </View>
+                    </View>
+                    <CustomTouchable
+                      className="w-10 h-10 flex-center rounded-full bg-gray-200"
+                      onPress={() =>
+                        navigation.navigate('AllAppointment', {id: item?._id})
+                      }>
+                      <Stethoscope className="text-black" size={20} />
+                    </CustomTouchable>
+                  </View>
+                  <Separator className="bg-gray-200 my-4" />
+
+                  <View className="flex-row items-center gap-5 justify-between mt-4">
+                    <Button
+                      variant={'primary'}
+                      className="rounded-xl bg-primary border-0 active:bg-primary/80"
+                      onPress={() =>
+                        navigation.navigate('BookAppointment', {id: item?._id})
+                      }>
+                      <Text className="text-white font-semibold">Book</Text>
+                    </Button>
+                    <Button
+                      variant={'primary'}
+                      onPress={() =>
+                        navigation.navigate('AllAppointment', {id: item?._id})
+                      }
+                      className="rounded-xl flex-1 bg-primary border-0 active:bg-primary/80">
+                      <Text className="text-white font-semibold">
+                        View Sessions
+                      </Text>
+                    </Button>
+                  </View>
                 </Card>
               </View>
             )}
             ListHeaderComponent={<Header />}
             ListEmptyComponent={
               <View className="mt-10">
-                <Text>No Doctor Found</Text>
+                {!isFetchingDoctors && !isFetchingDoctors && <Text>No Doctor Found</Text>}
               </View>
             }
             ListFooterComponent={<>{isFetchingDoctors && <ContentLoader />}</>}
@@ -104,15 +131,5 @@ const HomeScreen = () => {
     </ScreenWrapperWithoutScrollView>
   )
 }
-
-const styles = StyleSheet.create({
-  listContent: {
-    paddingHorizontal: cardSpacing,
-    paddingTop: 12,
-  },
-  cardContainer: {
-    marginBottom: cardSpacing,
-  },
-})
 
 export default HomeScreen

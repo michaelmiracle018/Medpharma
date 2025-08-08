@@ -28,3 +28,19 @@ export interface IBookAppointment {
   lastName: string
   slotId: string | undefined
 }
+
+export interface IAllAppointment {
+  _id: string
+  doctorId: string
+  slotStart: string
+  slotEnd: string
+  status: string
+  createdAt: string
+  updatedAt: string
+  patientId: {
+    _id: string
+    name: string
+    email: string
+    role: string
+  }
+}

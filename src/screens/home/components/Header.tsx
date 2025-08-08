@@ -10,38 +10,33 @@ import {Input} from '~/components/ui/input'
 import {Separator} from '@rn-primitives/dropdown-menu'
 import {Calendar} from '~/lib/icons/Calendar'
 import {AlarmClock} from '~/lib/icons/AlarmClock'
+import {useNavigation} from '@react-navigation/native'
+import {NavigationMainProp} from '~/types/navigationTypes'
 
 export const Header = () => {
+  const navigation = useNavigation<NavigationMainProp>()
+
   return (
     <View>
       <>
         <View className="flex justify-between flex-row items-center">
           <View>
             <View className="flex-row gap-1">
-              <H3 className="text-black text-center">Good Morning</H3>
+              <H3 className="text-black text-center">Good Day</H3>
               <HelloWave />
             </View>
-            <Text className="font-semibold mt-2">Miracle Michael</Text>
           </View>
-          <Bell className="size-5" />
-        </View>
-
-        {/* Search Bar */}
-        <View className="mt-4 mb-6">
-          <Input
-            placeholder="Search Doctors..."
-            className="bg-gray-100 rounded-xl px-4 py-2"
-          />
         </View>
 
         {/* Upcoming Appointment */}
-        <View className="flex justify-between flex-row mt-5 mb-3 items-center">
+        {/* <View className="flex justify-between flex-row mt-16 mb-3 items-center">
           <Text className="font-semibold">Upcoming Appointments</Text>
-          <CustomTouchable>
+          <CustomTouchable
+            onPress={() => navigation.navigate('AllAppointment')}>
             <Text>Seel All</Text>
           </CustomTouchable>
-        </View>
-        <View className="bg-blue-500 rounded-xl p-4 mb-6">
+        </View> */}
+        {/* <View className="bg-blue-500 rounded-xl p-4 mb-6">
           <View className="flex-row items-center">
             <Image
               source={images.miracle}
@@ -90,7 +85,7 @@ export const Header = () => {
               <Text className="text-white font-semibold">View Profile</Text>
             </Button>
           </View>
-        </View>
+        </View> */}
         <Text className="text-lg font-semibold mt-5 mb-3">Popular Healers</Text>
       </>
     </View>

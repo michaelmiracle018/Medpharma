@@ -30,3 +30,7 @@ export function serviceAppointmentQueueInfo(id: string) {
 export function serviceAppointmentCancel(id: string) {
   return api.patch(`appointments/${id}/cancel`)
 }
+
+export function serviceGetAllAppointment(id: string) {
+  return api.get(`appointments/active/${id}`)
+}

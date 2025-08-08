@@ -3,26 +3,12 @@ import {createNavigatorFactory} from '@react-navigation/native'
 import {SpecificDoctor} from '~/screens/doctors/SpecificDoctor'
 import {BookAppointment} from '~/screens/appointments/BookAppointment'
 import HomeScreen from '~/screens/home/HomeScreen'
+import {AllAppointment} from '~/screens/appointments/AllAppointment'
 
 const createMyNavigator = createNavigatorFactory(CreateNativeStackNavigator)
 
 const Stack = createMyNavigator()
 export default function MainNavigation() {
-  // const {getUserAccountType} = useAppSelector(state => state.authStore)
-  // const closeAnyActiveElement = useCloseAnyActiveElement()
-
-  // useEffect(() => {
-  //   if (isAndroid) {
-  //     const listener = BackHandler.addEventListener('hardwareBackPress', () => {
-  //       return closeAnyActiveElement()
-  //     })
-
-  //     return () => {
-  //       listener.remove()
-  //     }
-  //   }
-  // }, [closeAnyActiveElement])
-
   return (
     <>
       <Stack.Navigator initialRouteName="HomeScreen">
@@ -45,6 +31,13 @@ export default function MainNavigation() {
           <Stack.Screen
             name="BookAppointment"
             getComponent={() => BookAppointment as any}
+            options={{
+              headerShown: false,
+            }}
+          />
+          <Stack.Screen
+            name="AllAppointment"
+            getComponent={() => AllAppointment as any}
             options={{
               headerShown: false,
             }}

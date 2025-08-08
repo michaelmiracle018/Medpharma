@@ -32,6 +32,7 @@ import {ContentLoader} from '~/components/loader/ContentLoader'
 import {Input} from '~/components/ui/input'
 import {toast} from 'sonner-native'
 import {IBookAppointment} from '~/types'
+import {useRefreshOnFocus} from '~/hooks/useRefreshOnFocus'
 
 // ----- types -----
 interface Slot {
@@ -76,6 +77,7 @@ export const BookAppointment = ({
     isLoading: isFetchingAvailableSlots,
     data: availableSlots,
     isRefetching: isRefetchingAvailableSlots,
+    refetch: refetchAvailableSlots,
   } = useQuery({
     queryKey: [FETCH_APPOINTMENT_AVAILABLE, id],
     queryFn: () => serviceGetAppointmentAvailable(id),
@@ -238,16 +240,8 @@ export const BookAppointment = ({
       slotId,
     } as IAppointment)
   }
-  //  IMPORT QUERIES
-  const {mutate, isPending} = useMutation({
-    mutationFn: (value: IBookAppointment) => serviceBookAppointment(value),
-    onSuccess: async response => {
-      toast.success(`Order approved successfully`)
-    },
-    onError: (error: any) => {},
-  })
 
-  // form
+  useRefreshOnFocus(refetchAvailableSlots)
   const {
     control,
     handleSubmit,
@@ -256,11 +250,22 @@ export const BookAppointment = ({
     defaultValues: {email: '', firstName: '', lastName: ''},
   })
 
-  // example submit
+  //  IMPORT QUERIES
+  const {mutate, isPending} = useMutation({
+    mutationFn: (value: IBookAppointment) => serviceBookAppointment(value),
+    onSuccess: async response => {
+      console.log(response, 'llll')
+
+      toast.success(`Appointment booked successfully`)
+    },
+    onError: (error: any) => {
+      const {data} = error.response
+      toast.error(data?.message || 'An error occurred while booking')
+    },
+  })
+
   const onSubmit = (vals: IFormInputs) => {
     mutate({...vals, slotId: selectedAppointment?.slotId})
-    console.log('booking payload', {...vals, selectedAppointment})
-    // do booking call here using selectedAppointment.slotId
   }
 
   return (
@@ -272,7 +277,10 @@ export const BookAppointment = ({
       <ScreenWrapperWithScrollView isStatusBarHeight={false}>
         <View className={cn('spacing-1')}>
           {isFetchingAvailableSlots || isRefetchingAvailableSlots ? (
-            <ContentLoader />
+            <View className="flex-center flex-1">
+              <ContentLoader />
+              <Text>Loading Appointment</Text>
+            </View>
           ) : (
             <>
               {availableDates.length === 0 ? (
@@ -344,13 +352,16 @@ export const BookAppointment = ({
               <View className="mb-20 mt-10">
                 <Button
                   onPress={handleSubmit(onSubmit)}
-                  // disabled={!selectedAppointment?.slotId || isPending}
-                >
-                  <Text>
-                    {selectedAppointment?.slotId
-                      ? 'Book Session'
-                      : 'Select a slot'}
-                  </Text>
+                  disabled={!selectedAppointment?.slotId || isPending}>
+                  {isPending ? (
+                    <ContentLoader />
+                  ) : (
+                    <Text>
+                      {selectedAppointment?.slotId
+                        ? 'Book Session'
+                        : 'Select a slot'}
+                    </Text>
+                  )}
                 </Button>
               </View>
             </>

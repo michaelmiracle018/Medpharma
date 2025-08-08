@@ -9,7 +9,7 @@
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
     "splash": {
-      "image": "",
+      "image": "./src/assets/images/medpharma.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
