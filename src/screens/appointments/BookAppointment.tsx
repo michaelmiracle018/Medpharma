@@ -241,7 +241,6 @@ export const BookAppointment = ({
     } as IAppointment)
   }
 
-  useRefreshOnFocus(refetchAvailableSlots)
   const {
     control,
     handleSubmit,
@@ -265,6 +264,9 @@ export const BookAppointment = ({
   const onSubmit = (vals: IFormInputs) => {
     mutate({...vals, slotId: selectedAppointment?.slotId})
   }
+
+  useRefreshOnFocus(refetchAvailableSlots)
+
 
   return (
     <View className="flex-1 bg-white" style={{paddingTop: statusBarHeight}}>
