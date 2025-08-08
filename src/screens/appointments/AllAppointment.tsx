@@ -81,7 +81,7 @@ export const AllAppointment = ({
               </View>
             }
             ListHeaderComponent={
-              <H3 className="text-center my-5">All Appointment</H3>
+              <H3 className="text-center my-5">Active Appointment</H3>
             }
             ListFooterComponent={
               <>{isFetchingAllAppointments && <ContentLoader />}</>
