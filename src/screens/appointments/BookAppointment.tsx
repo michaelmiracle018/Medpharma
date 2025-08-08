@@ -84,6 +84,8 @@ export const BookAppointment = ({
     enabled: !!id,
   })
 
+  console.log(availableSlots, 'availableSlots in BookAppointment')
+
   const timeToIdMap = useRef<Record<string, string>>({})
 
   const autoSelectedRef = useRef(false)
@@ -118,7 +120,7 @@ export const BookAppointment = ({
     const futureSlots = slotsArray
       .filter(s => {
         const end = new Date(s.slotEnd).getTime()
-        return end > now && String(s.status).toUpperCase() === 'WAITING'
+        return end > now && String(s.status).toUpperCase()
       })
       .sort(
         (a, b) =>
@@ -160,6 +162,7 @@ export const BookAppointment = ({
         return {date: isoMidnight, slotTimes}
       })
   }, [slotsArray])
+  console.log(availableDates, 'availableDates in BookAppointment')
 
   // When slots load, auto-select the first available slot (only once)
   useEffect(() => {
@@ -283,19 +286,17 @@ export const BookAppointment = ({
             </View>
           ) : (
             <>
-              {availableDates.length === 0 ? (
+              {availableSlots.length === 0 ? (
                 <Text className="font-bold text-center text-lg">
                   No available slots
                 </Text>
               ) : (
                 <TimeSlotPicker
                   availableDates={availableDates}
-                  scheduledAppointment={bookedData}
+                  // scheduledAppointment={bookedData}
                   setDateOfAppointment={handlePickerSelect}
                 />
               )}
-
-              {/* <SelectedTimeSlot dateOfAppointment={selectedAppointment} /> */}
 
               <View className="mt-5">
                 <Label className="mb-2 font-medium text-lg">Email</Label>

@@ -65,7 +65,7 @@ const CountTimer = ({timeStamp, timerContainerStyle}: Props) => {
           <TouchableOpacity>
             <View
               className={cn(
-                'bg-stone-200 px-2 py-1 rounded-md',
+                'bg-stone-100 px-2 py-1 rounded-md',
                 timerContainerStyle,
               )}>
               <Text className="text-timer">{formatTime(timeLeft)}</Text>

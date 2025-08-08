@@ -110,13 +110,15 @@ const HomeScreen = () => {
             ListHeaderComponent={<Header />}
             ListEmptyComponent={
               <View className="mt-10">
-                {!isFetchingDoctors && !isFetchingDoctors && <Text>No Doctor Found</Text>}
+                {!isFetchingDoctors && !isFetchingDoctors && (
+                  <Text>No Doctor Found</Text>
+                )}
               </View>
             }
             ListFooterComponent={<>{isFetchingDoctors && <ContentLoader />}</>}
             refreshControl={
               <RefreshControl
-                onRefresh={() => {}}
+                onRefresh={refetchDoctors}
                 refreshing={false}
                 tintColor={Colors.primary}
                 title="Refreshing..."

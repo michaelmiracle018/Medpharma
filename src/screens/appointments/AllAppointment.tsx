@@ -39,12 +39,13 @@ export const AllAppointment = ({
     enabled: !!id,
   })
 
+  console.log(allAppointments, 'newData in AllAppointment')
+
   const newData = useMemo(() => {
-    if (allAppointments?.data) {
-      return allAppointments?.data
+    if (allAppointments) {
+      return allAppointments
     }
   }, [allAppointments])
-  console.log(newData, 'jjj')
 
   const renderMarketItem = useCallback(
     ({item}: {item: IAllAppointment | any}) => {
@@ -76,9 +77,9 @@ export const AllAppointment = ({
             contentInsetAdjustmentBehavior="always"
             ListEmptyComponent={
               <View className="mt-10">
-                {!isRefetchingAllAppointments && !isFetchingAllAppointments &&
-                <Text>No Doctor Found</Text>
-                }
+                {!isRefetchingAllAppointments && !isFetchingAllAppointments && (
+                  <Text className="text-center font-bold">No Doctor Found</Text>
+                )}
               </View>
             }
             ListHeaderComponent={
@@ -89,7 +90,7 @@ export const AllAppointment = ({
             }
             refreshControl={
               <RefreshControl
-                onRefresh={() => {}}
+                onRefresh={refetchAllAppointments}
                 refreshing={false}
                 tintColor={Colors.primary}
                 title="Refreshing..."

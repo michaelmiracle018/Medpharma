@@ -1,27 +1,21 @@
 import type {NativeStackNavigationProp} from '@react-navigation/native-stack'
-
-import {QueryObserverResult, RefetchOptions} from '@tanstack/react-query'
+import {IAllAppointment} from '~/types/index'
 
 export type {NativeStackScreenProps} from '@react-navigation/native-stack'
 
 export type CommonNavigatorParams = {
   BookAppointment: {id: string}
   AllAppointment: {id: string}
+  SpecificDoctor: {item: IAllAppointment}
 }
 
 export type BottomTabNavigatorParams = CommonNavigatorParams & {}
 
 export type MainNavigatorParams = {
-  SpecificDoctor: undefined
+  SpecificDoctor: {item: IAllAppointment}
   Doctors: undefined
   BookAppointment: {id: string}
   AllAppointment: {id: string}
-}
-
-type DeviceInfoProps = {
-  deviceOS: string
-  deviceName: string | null
-  deviceId: string | null
 }
 
 export type AuthNavigatorParams = {

@@ -44,3 +44,8 @@ export interface IAllAppointment {
     role: string
   }
 }
+
+export interface IDoctorProps {
+  name: string
+  role: string
+}

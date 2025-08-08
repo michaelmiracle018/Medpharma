@@ -23,14 +23,26 @@ export function serviceBookAppointment(data: IBookAppointment) {
   })
 }
 
-export function serviceAppointmentQueueInfo(id: string) {
-  return api.get(`appointments/${id}/queue-info`)
+export async function serviceAppointmentQueueInfo(id: string) {
+  try {
+    const result = await api.get(`appointments/${id}/queue-info`)
+    if (result) return result?.data
+    return null
+  } catch (error) {
+    throw error
+  }
 }
 
 export function serviceAppointmentCancel(id: string) {
   return api.patch(`appointments/${id}/cancel`)
 }
 
-export function serviceGetAllAppointment(id: string) {
-  return api.get(`appointments/active/${id}`)
+export async function serviceGetAllAppointment(id: string) {
+  try {
+    const result = await api.get(`appointments/active/${id}`)
+    if (result) return result?.data
+    return null
+  } catch (error) {
+    throw error
+  }
 }
