@@ -13,6 +13,7 @@ import {cn} from '~/lib/utils'
 import {useNavigation} from '@react-navigation/native'
 import {NavigationMainProp} from '~/types/navigationTypes'
 import {Check} from '~/lib/icons/Check'
+import {User} from 'lucide-react-native'
 
 export const RenderAppointmentCard = (item: IAllAppointment) => {
   const {date, startTime, endTime} = parseTimeSlot(
@@ -41,11 +42,10 @@ export const RenderAppointmentCard = (item: IAllAppointment) => {
         </View>
         <View className="px-3">
           <View className="flex-row items-center justify-between">
-            <View className="flex-row items-center ">
-              <Image
-                source={images.doctor_img}
-                className="w-14 h-14 rounded-full mr-4"
-              />
+            <View className="flex-row items-center gap-5">
+              <View className="rounded-full bg-gray-100 h-14 w-14 flex-center">
+                <User size={30} />
+              </View>
               <View>
                 <Text className="text-lg text-black font-semibold">
                   {item?.patientId?.name}

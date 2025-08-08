@@ -84,8 +84,6 @@ export const BookAppointment = ({
     enabled: !!id,
   })
 
-  console.log(availableSlots, 'availableSlots in BookAppointment')
-
   const timeToIdMap = useRef<Record<string, string>>({})
 
   const autoSelectedRef = useRef(false)
@@ -162,7 +160,6 @@ export const BookAppointment = ({
         return {date: isoMidnight, slotTimes}
       })
   }, [slotsArray])
-  console.log(availableDates, 'availableDates in BookAppointment')
 
   // When slots load, auto-select the first available slot (only once)
   useEffect(() => {
@@ -257,8 +254,6 @@ export const BookAppointment = ({
   const {mutate, isPending} = useMutation({
     mutationFn: (value: IBookAppointment) => serviceBookAppointment(value),
     onSuccess: async response => {
-      console.log(response, 'llll')
-
       toast.success(`Appointment booked successfully`)
     },
     onError: (error: any) => {

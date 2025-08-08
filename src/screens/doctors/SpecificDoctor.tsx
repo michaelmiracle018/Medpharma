@@ -25,6 +25,7 @@ import {ContentLoader} from '~/components/loader/ContentLoader'
 import {useRefreshOnFocus} from '~/hooks/useRefreshOnFocus'
 import {useMemo} from 'react'
 import {parseTimeSlot} from '~/utils/parseTimeSlot'
+import {User} from 'lucide-react-native'
 
 export const SpecificDoctor = ({
   route,
@@ -48,7 +49,6 @@ export const SpecificDoctor = ({
     appointmentQueueInfo?.scheduledStart,
     appointmentQueueInfo?.scheduledEnd,
   )
-  // console.log(appointmentQueueInfo, 'appointmentQueueInfo');
   const now = new Date()
   const currentTime = now.toLocaleTimeString('en-US', {
     hour: 'numeric',
@@ -69,10 +69,9 @@ export const SpecificDoctor = ({
       <ScreenWrapperWithScrollView isStatusBarHeight={false}>
         <View className={cn('spacing-1')}>
           <View className="flex-center mt-10">
-            <Image
-              source={images.doctor_img}
-              className="w-32 h-32 rounded-full mb-4 object-cover"
-            />
+            <View className="rounded-full bg-gray-100 h-20 w-20 flex-center">
+              <User size={40} />
+            </View>
             <H2 className="text-xl font-bold text-black">
               {item?.patientId?.name}
             </H2>
@@ -87,8 +86,18 @@ export const SpecificDoctor = ({
           ) : (
             <>
               <View className="flex-center my-5">
-                <Text className="font-bold text-3xl text-primary">4</Text>
-                <Text className="text-gray-500 ">You are 3rd in the queue</Text>
+                <Text className="font-bold text-3xl text-primary">
+                  {item.index}
+                </Text>
+                <Text className="text-gray-500 ">
+                  You are{' '}
+                  {item.index === 1
+                    ? '1st'
+                    : item.index === 2
+                      ? '2nd'
+                      : `${item.index}th`}{' '}
+                  in the queue
+                </Text>
               </View>
               <View>
                 <View

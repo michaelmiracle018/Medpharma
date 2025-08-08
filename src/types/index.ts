@@ -31,6 +31,7 @@ export interface IBookAppointment {
 
 export interface IAllAppointment {
   _id: string
+  index?: number | undefined
   doctorId: string
   slotStart: string
   slotEnd: string

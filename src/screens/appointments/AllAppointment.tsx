@@ -39,8 +39,6 @@ export const AllAppointment = ({
     enabled: !!id,
   })
 
-  console.log(allAppointments, 'newData in AllAppointment')
-
   const newData = useMemo(() => {
     if (allAppointments) {
       return allAppointments
@@ -48,8 +46,8 @@ export const AllAppointment = ({
   }, [allAppointments])
 
   const renderMarketItem = useCallback(
-    ({item}: {item: IAllAppointment | any}) => {
-      return <RenderAppointmentCard {...item} />
+    ({item, index}: {item: IAllAppointment | any; index: number}) => {
+      return <RenderAppointmentCard {...item} index={index + 1} />
     },
     [id],
   )
@@ -60,7 +58,7 @@ export const AllAppointment = ({
       <ScreenWrapperWithoutScrollView>
         <View className="mb-5 spacing-1">
           <BackIcon
-            text="All Appointments"
+            text="Active Appointments"
             onPress={() => navigation.goBack()}
           />
         </View>
